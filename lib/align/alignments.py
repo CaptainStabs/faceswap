@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ Alignments file functions for reading, writing and manipulating the data stored in a
 serialized alignments file. """
-
+import sys
 import logging
 import os
 from datetime import datetime
@@ -692,10 +692,17 @@ class Alignments():
             ``True`` if the alignments file contains legacy `landmarksXY` keys otherwise ``False``
         """
         logger.debug("checking legacy landmarksXY")
-        retval = (any(key == "landmarksXY"
+        try:
+            retval = (any(key == "landmarksXY"
                       for val in self._data.values()
                       for alignment in val["faces"]
                       for key in alignment))
+
+        except KeyError:
+            logger.warning("This alignment file already exists. Change -al path.")
+            sys.exit()
+            raise
+
         logger.debug("legacy landmarksXY: %s", retval)
         return retval
 
